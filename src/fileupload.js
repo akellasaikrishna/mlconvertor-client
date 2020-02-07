@@ -3,7 +3,7 @@ import axios from "axios";
 import { saveAs } from "file-saver";
 const xlsx = require("xlsx");
 
-export default function FileUpload() {
+export default function FileUpload(props) {
   const [file, setFile] = useState("");
   const [filename, setFilename] = useState("Choose File");
   const [conversionType, setConversionType] = useState(true);
@@ -47,11 +47,15 @@ export default function FileUpload() {
     const formData = new FormData();
     formData.append("docs", file);
     try {
-      const res = await axios.post(conversionApiPath, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data"
+      const res = await axios.post(
+        `${props.apiUrl}${conversionApiPath}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
         }
-      });
+      );
       window.alert(res.data.message);
       setShowDownloadBtn(true);
     } catch (error) {
@@ -63,11 +67,15 @@ export default function FileUpload() {
     const formData = new FormData();
     let blob;
     formData.append("filename", filename);
-    const res = await axios.post(downloadApiPath, formData, {
-      headers: {
-        "Content-Type": "application/json"
+    const res = await axios.post(
+      `${props.apiUrl}${downloadApiPath}`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/json"
+        }
       }
-    });
+    );
     if (downloadApiPath === "/downloadJson") {
       blob = new Blob([JSON.stringify(res.data)], {
         type: "application/json,"
