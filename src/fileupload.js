@@ -47,11 +47,12 @@ export default function FileUpload() {
     const formData = new FormData();
     formData.append("docs", file);
     try {
-      await axios.post(conversionApiPath, formData, {
+      const res = await axios.post(conversionApiPath, formData, {
         headers: {
           "Content-Type": "multipart/form-data"
         }
       });
+      window.alert(res.data.message);
       setShowDownloadBtn(true);
     } catch (error) {
       window.alert("Server responded with an error");
@@ -79,17 +80,20 @@ export default function FileUpload() {
         const newWb = xlsx.utils.book_new();
         const newWs = xlsx.utils.json_to_sheet(jsonData);
         xlsx.utils.book_append_sheet(newWb, newWs, item);
-        xlsx.writeFileSync(newWb, "converted_sheet.xlsx");
+        xlsx.writeFileSync(newWb, `${filename.split(".")[0]}.xlsx`);
       });
     }
   };
 
   let button;
   if (showDownloadBtn) {
+    const buttonTitle = conversionType
+      ? `Download ${filename.split(".")[0]}.json`
+      : `Download ${filename.split(".")[0]}.xlsx`;
     button = (
       <input
         type="submit"
-        value="Download"
+        value={buttonTitle}
         className="btn btn-primary btn-block mt-4"
         onClick={() => {
           download();
@@ -131,7 +135,7 @@ export default function FileUpload() {
         </div>
         <input
           type="submit"
-          value="Upload"
+          value="Convert"
           className="btn btn-primary btn-block mt-4"
         ></input>
       </form>
